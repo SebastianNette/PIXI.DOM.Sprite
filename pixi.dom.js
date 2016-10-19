@@ -1,42 +1,42 @@
  /**
-  * PIXI.DOM v.0.1.0
-  *
-  * PIXI.DOM is a pixi.js plugin, created to allow you to render DOM elements on top of your pixi stage.
-  * In later versions, this plugin might get a few sub plugins to actually let you render DOM elements on canvas.
-  *
-  * How to use:
-  *
-  * 1. just include this file after your pixi.js
-  *
-  * ```<script src="pixi.js"></script>
-  * <script src="pixi.dom.js"></script>```
-  *
-  * 2. set up the plugin (make sure to call PIXI.DOM.Setup after you have attached the view to your page)
-  *
-  * ```var stage = new PIXI.Stage(...);
-  * var renderer = PIXI.autoDetectrenderer(...);
-  * document.body.appendChild(renderer.view);
-  * PIXI.DOM.Setup( renderer, true );```
-  *
-  * 3. create elements
-  *
-  * ```var input = new PIXI.DOM.Sprite( '<input type="text" placeholder="enter message" />', { x: 10, y: 10 } );
-  * stage.addChild(input);```
-  *
-  * ```var iframe = new PIXI.DOM.Sprite( '<iframe>', { src: "http://www.pixijs.com" } );
-  * iframe.position.x = 100;
-  * iframe.position.y = 100;
-  * stage.addChild(iframe);```
-  *
-  * ```var textarea = new PIXI.DOM.Sprite( document.getElementById('#mytextarea') );
-  * stage.addChild( textarea );```
-  *
-  * 4. destroying elements
-  *
-  * ```input.destroy(); input = null;```
-  * ```iframe.destroy(); iframe = null;```
-  * ```textarea.destroy(); textarea = null;```
-  */
+	* PIXI.DOM v.0.1.0
+	*
+	* PIXI.DOM is a pixi.js plugin, created to allow you to render DOM elements on top of your pixi stage.
+	* In later versions, this plugin might get a few sub plugins to actually let you render DOM elements on canvas.
+	*
+	* How to use:
+	*
+	* 1. just include this file after your pixi.js
+	*
+	* ```<script src="pixi.js"></script>
+	* <script src="pixi.dom.js"></script>```
+	*
+	* 2. set up the plugin (make sure to call PIXI.DOM.Setup after you have attached the view to your page)
+	*
+	* ```var stage = new PIXI.Stage(...);
+	* var renderer = PIXI.autoDetectrenderer(...);
+	* document.body.appendChild(renderer.view);
+	* PIXI.DOM.Setup( renderer, true );```
+	*
+	* 3. create elements
+	*
+	* ```var input = new PIXI.DOM.Sprite( '<input type="text" placeholder="enter message" />', { x: 10, y: 10 } );
+	* stage.addChild(input);```
+	*
+	* ```var iframe = new PIXI.DOM.Sprite( '<iframe>', { src: "http://www.pixijs.com" } );
+	* iframe.position.x = 100;
+	* iframe.position.y = 100;
+	* stage.addChild(iframe);```
+	*
+	* ```var textarea = new PIXI.DOM.Sprite( document.getElementById('#mytextarea') );
+	* stage.addChild( textarea );```
+	*
+	* 4. destroying elements
+	*
+	* ```input.destroy(); input = null;```
+	* ```iframe.destroy(); iframe = null;```
+	* ```textarea.destroy(); textarea = null;```
+	*/
 
  (function(PIXI, undefined) {
 
@@ -101,7 +101,7 @@
 	var generateFakeTexture = function(w, h) {
 		return {
 			baseTexture: { hasLoaded: true },
-			frame: { width: w, height: h }
+			orig: { width: w, height: h }
 		};
 	};
 
@@ -133,7 +133,7 @@
 		ctx.stroke();
 		ctx.closePath();
 
-		// create texture		
+		// create texture
 		return PIXI.Texture.fromCanvas(can);
 	};
 
@@ -144,7 +144,7 @@
 		if( typeof tag !== 'string' ) {
 			return tag;
 		}
-		
+
 		// jquery like id selector
 		if( tag.charAt(0) === '#' ) {
 			return document.getElementById( tag.slice(1) );
@@ -162,7 +162,7 @@
 
 	/* pixi.js doesn't render / touch children of hidden sprites at all, so we have to go all the way up to find out if we are invisible or not */
 	var invisbilityCheck = function(displayObject) {
-		return !displayObject.visible || displayObject.alpha <= 0 || (displayObject.stage !== displayObject && (!displayObject.parent || invisbilityCheck(displayObject.parent)));
+		return !displayObject.visible || displayObject.alpha <= 0 || (displayObject.parent && invisbilityCheck(displayObject.parent));
 	};
 
 	//
@@ -184,17 +184,17 @@
 				wrapper.style.width = renderer.view.width + 'px';
 				wrapper.style.height = renderer.view.height + 'px';
 			};
-			
+
 			// attach view to wrapper
 			renderer.view.parentNode.appendChild( wrapper );
 			renderer.view.parentNode.removeChild( renderer.view );
 			wrapper.appendChild( renderer.view );
-			
+
 			this.setDomContainer( wrapper );
 		}
 	};
 
-	// 
+	//
 	DOM.setDomContainer = function( container ) {
 		_domContainer = container;
 	};
@@ -259,8 +259,8 @@
 		}
 
 		/* sprite dimensions */
-		var width	= parseInt((computed && (computed.getPropertyValue('width') || computed.width)) || (opts.css && opts.css.width) || opts.width || 100) || 100;
-		var height	= parseInt((computed && (computed.getPropertyValue('height') || computed.height)) || (opts.css && opts.css.height) || opts.height || 30) || 30;
+		var width = parseInt((computed && (computed.getPropertyValue('width') || computed.width)) || (opts.css && opts.css.width) || opts.width || 100) || 100;
+		var height  = parseInt((computed && (computed.getPropertyValue('height') || computed.height)) || (opts.css && opts.css.height) || opts.height || 30) || 30;
 
 		// dirty fix for width and height in IE (should work on other browsers too)
 		if(rect) {
@@ -276,8 +276,8 @@
 		PIXI.Sprite.call( this, _debugMode ? generateDebugTexture(width, height) : generateFakeTexture(width, height) );
 
 		/* sprite data */
-		this.width		= width;
-		this.height		= height;
+		this.width    = width;
+		this.height   = height;
 		this.position.x = opts.x !== undefined ? opts.x : (parseInt((computed && (computed.getPropertyValue('left') || computed.left)) || (opts.css && opts.css.left) || 0) || 0);
 		this.position.y = opts.y !== undefined ? opts.y : (parseInt((computed && (computed.getPropertyValue('top') || computed.top)) || (opts.css && opts.css.top) || 0) || 0);
 
@@ -341,10 +341,10 @@
 		}
 		if(!this.visible || this.alpha <= 0) return;
 		for(var i = 0, j = this.children.length; i < j; i++) {
-            this.children[i]._renderCanvas(renderSession);
-        }
+						this.children[i]._renderCanvas(renderSession);
+				}
 	};
-	
+
 	/* webgl rendering */
 	DOM.Sprite.prototype._oldRenderWebGL = DOM.Sprite.prototype._renderWebGL;
 	DOM.Sprite.prototype._renderWebGL = function(renderSession) {
@@ -354,8 +354,8 @@
 		}
 		if(!this.visible || this.alpha <= 0) return;
 		for(var i = 0, j = this.children.length; i < j; i++) {
-            this.children[i]._renderWebGL(renderSession);
-        }
+						this.children[i]._renderWebGL(renderSession);
+				}
 	};
 
 	/* removes the element from dom and destroys the texture */
