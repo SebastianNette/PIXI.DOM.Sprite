@@ -38,7 +38,7 @@
 	* ```textarea.destroy(); textarea = null;```
 	*/
 
- (function(PIXI, undefined) {
+ module.exports = function(PIXI) {
 
 	var DOM = {};
 
@@ -421,19 +421,18 @@
 	 * any opinions?
 	 * alternative: always add an interaction?
 	 */
-	PIXI.WebGLRenderer.prototype.oldRender = PIXI.WebGLRenderer.prototype.render;
+	var oldRenderWEBGL = PIXI.WebGLRenderer.prototype.render;
 	PIXI.WebGLRenderer.prototype.render = function(stage) {
-		this.oldRender(stage);
+		oldRenderWEBGL.call(this, stage);
 		update();
 	};
-	PIXI.CanvasRenderer.prototype.oldRender = PIXI.CanvasRenderer.prototype.render;
+	var oldRenderCanvas = PIXI.CanvasRenderer.prototype.render;
 	PIXI.CanvasRenderer.prototype.render = function(stage) {
-		this.oldRender(stage);
+		oldRenderWEBGL.call(this, stage);
 		update();
 	};
 
 	// namespace
 	PIXI.DOM = DOM;
 	PIXI.DOMSprite = DOM.Sprite;
-
- })(PIXI);
+ }
