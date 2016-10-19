@@ -1,0 +1,8 @@
+{
+  "name": "pixi.dom",
+  "version": "0.0.0",
+  "scripts": {},
+  "main":"./pixi.dom.js",
+  "keywords": [],
+  "license": "ISC"
+}
