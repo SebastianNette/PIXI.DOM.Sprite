@@ -199,6 +199,10 @@
 		_domContainer = container;
 	};
 
+	DOM.getAllElements = function(){
+		return _domElements
+	}
+
 	//
 	DOM.Sprite = function( tag, opts ) {
 
