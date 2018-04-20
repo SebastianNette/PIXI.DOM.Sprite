@@ -247,7 +247,7 @@
        this.oldCssText = '';
 
        /* add sprite to update loop and set some more css */
-       this.domElement.style.cssText += _onScreenCSS;
+       if(!opts.noAbsolute) this.domElement.style.cssText += _onScreenCSS;
        this.oldCssText = this.domElement.style.cssText + '';
        this.domElement.style.cssText = _hideCSS;
        _domElements.push(this);
